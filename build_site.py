@@ -126,10 +126,6 @@ def build():
               <td colspan="2">{s['tm']}</td>
             </tr>
             <tr>
-              <td class="fw-bold">Yo'nalish:</td>
-              <td colspan="2">{s['yonalish']}</td>
-            </tr>
-            <tr>
               <td class="fw-bold">Mutaxassislik:</td>
               <td colspan="2">{s['mutaxassislik']}</td>
             </tr>
@@ -144,10 +140,6 @@ def build():
             <tr>
               <td class="fw-bold">Sertifikat seriya va raqami:</td>
               <td colspan="2">{s['sertifikat_raqami']}</td>
-            </tr>
-            <tr>
-              <td class="fw-bold">Sertifikat turi:</td>
-              <td colspan="2">{s['sertifikat_turi']}</td>
             </tr>
             <tr>
               <td class="fw-bold">Qayd raqami:</td>
