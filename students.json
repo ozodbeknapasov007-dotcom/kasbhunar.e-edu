@@ -598,5 +598,25 @@
     "sertifikat_turi": "Oddiy",
     "dak_qarori": "26/21",
     "dak_sanasi": "2026-06-15"
+  },
+  {
+    "id": 31,
+    "token": "e60fbcb2-ee31-432c-bdd5-326f5624fa76",
+    "fio": "TURSUNOVA MOHINUR JO'RABEK QIZI",
+    "familiya": "TURSUNOVA",
+    "ismi": "MOHINUR",
+    "sharifi": "JO'RABEK QIZI",
+    "pinfl": "61607025680034",
+    "tugilgan_sana": "2002-07-16",
+    "sertifikat_raqami": "QT L&P № 0000031",
+    "qayd_raqami": "0000031",
+    "tm": "QARSHI TIBBIYOT TEXNIKUMI",
+    "yonalish": "Logopediya (tayyorlash, qayta tayyorlash va malakasini oshirish)",
+    "mutaxassislik": "Logopediya",
+    "oqish_soati": "360 soat",
+    "oqish_davri": "23.03.2026 yildan 13.06.2026 yilgacha",
+    "sertifikat_turi": "Oddiy",
+    "dak_qarori": "26/21",
+    "dak_sanasi": "2026-06-15"
   }
 ]

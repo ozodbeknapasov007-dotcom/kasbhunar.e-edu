@@ -162,7 +162,7 @@ def build():
         with open(os.path.join(folder, 'index.html'), 'w', encoding='utf-8') as f:
             f.write(html_student)
 
-    print(f"Barcha 30 ta talaba sahifasi muvaffaqiyatli 'dist/' papkasiga yaratildi!")
+    print(f"Barcha {len(students)} ta talaba sahifasi muvaffaqiyatli 'dist/' papkasiga yaratildi!")
 
 if __name__ == '__main__':
     build()

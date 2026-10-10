@@ -47,7 +47,7 @@ def generate_all(base_domain="https://kasbhunare-edu.vercel.app"):
         cell.alignment = Alignment(horizontal="center", vertical="center")
 
     print(f"Baza domen: {base_domain}")
-    print("30 ta yuqori sifatli (bosmaga tayyor 300 DPI) QR kod yaratilmoqda...")
+    print(f"{len(students)} ta yuqori sifatli (bosmaga tayyor 300 DPI) QR kod yaratilmoqda...")
 
     for s in students:
         idx = s['id']
@@ -107,15 +107,15 @@ def generate_all(base_domain="https://kasbhunare-edu.vercel.app"):
     wb.save(excel_report)
 
     # Archive to ZIP
-    zip_name = "QR_KODLAR_30_TALABA.zip"
+    zip_name = f"QR_KODLAR_{len(students)}_TALABA.zip"
     with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for file in os.listdir(out_dir):
             if file.endswith('.png'):
                 zipf.write(os.path.join(out_dir, file), file)
 
-    print(f"[OK] Barcha 30 ta QR kod '{out_dir}/' papkasiga saqlandi!")
+    print(f"[OK] Barcha {len(students)} ta QR kod '{out_dir}/' papkasiga saqlandi!")
     print(f"[OK] Chiroyli hisobot jadvali: '{excel_report}'")
-    print(f"[OK] Barcha QR kodlar bitta arxivda: '{zip_name}'")
+    print(f"[OK] Barcha QR kodlar arxivda: '{zip_name}'")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Farmatsiya talabalari uchun xavfsiz QR kodlar generatori")
