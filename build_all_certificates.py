@@ -1,6 +1,8 @@
 import json
 import os
 import zipfile
+import re
+import shutil
 import xml.sax.saxutils as saxutils
 import win32com.client
 import pymupdf
@@ -14,7 +16,7 @@ def main():
         students = json.load(f)
 
     docx_dir = 'sertifikatlar'
-    pdf_dir = 'sertifikatlar_pdf'
+    pdf_dir = 'PDF_SERTIFIKATLAR'
     os.makedirs(docx_dir, exist_ok=True)
     os.makedirs(pdf_dir, exist_ok=True)
 
@@ -37,7 +39,13 @@ def main():
     assert 'keying turini' in base_doc_xml, "keying turini not found"
     base_doc_xml = base_doc_xml.replace('keying turini', 'keyingi turini')
 
-    print(f"1-qadam: {len(students)} ta talaba uchun to'g'rilangan Word (.docx) sertifikatlari yaratilmoqda...")
+    # Fix 4: Tagidagi chiziqlar (Bottom borders) Word'da PDF ga eksport qilinganda aniq qora chiqishi uchun
+    # w:color="auto" o'rniga aniq qora rang w:color="000000" va w:sz="8" (1 pt) qilib o'rnatamiz
+    bdr_pattern = r'<w:bottom\s+w:val="single"[^/]*/>'
+    new_bdr = '<w:bottom w:val="single" w:sz="8" w:space="1" w:color="000000"/>'
+    base_doc_xml = re.sub(bdr_pattern, new_bdr, base_doc_xml)
+
+    print(f"1-qadam: {len(students)} ta talaba uchun tagiga chiziqlari bilan Word (.docx) sertifikatlari yaratilmoqda...")
 
     docx_files = []
 
@@ -80,7 +88,7 @@ def main():
 
         docx_files.append((os.path.abspath(docx_path), docx_name, idx, fio))
 
-    print(f"  [OK] Barcha {len(students)} ta individual Word (.docx) fayllari muvaffaqiyatli saqlandi!")
+    print(f"  [OK] Barcha {len(students)} ta Word fayli yaratildi!")
 
     # 2. Convert each DOCX to PDF using Word COM & merge DOCX into one
     print("\n2-qadam: Word va PDF hujjatlari yaratilmoqda (Microsoft Word COM orqali)...")
@@ -90,7 +98,7 @@ def main():
     word = win32com.client.Dispatch('Word.Application')
     word.Visible = False
     word.DisplayAlerts = 0
-    word.ScreenUpdating = False
+    # MUHIM: word.ScreenUpdating ni False qilmaymiz, chunki bu PDF da chiziqlarni yo'qotib qo'yadi!
 
     pdf_files = []
 
@@ -100,16 +108,36 @@ def main():
             pdf_name = docx_name.replace('.docx', '.pdf')
             full_pdf_path = os.path.abspath(os.path.join(pdf_dir, pdf_name))
             
+            if os.path.exists(full_pdf_path):
+                try:
+                    os.remove(full_pdf_path)
+                except Exception:
+                    pass
+
             doc = word.Documents.Open(full_docx_path)
             doc.SaveAs2(full_pdf_path, FileFormat=17) # 17 = wdFormatPDF
             doc.Close(False)
             
             pdf_files.append((full_pdf_path, pdf_name))
+            print(f"  [{idx:02d}/{len(students)}] PDF tayyor: {pdf_name}")
+
+            # Also sync to sertifikatlar_pdf if writable
+            old_pdf_path = os.path.abspath(os.path.join('sertifikatlar_pdf', pdf_name))
+            try:
+                shutil.copy2(full_pdf_path, old_pdf_path)
+            except Exception:
+                pass
 
         print(f"  [OK] Barcha {len(pdf_files)} ta individual PDF fayli yaratildi!")
 
         # Create single combined DOCX
         print("\n3-qadam: Barcha 31 ta sertifikat bitta Word faylga birlashtirilmoqda...")
+        if os.path.exists(merged_docx_path):
+            try:
+                os.remove(merged_docx_path)
+            except Exception:
+                pass
+
         merged_doc = word.Documents.Open(docx_files[0][0])
         for full_docx_path, docx_name, idx, fio in docx_files[1:]:
             sel = word.Selection
@@ -129,6 +157,12 @@ def main():
 
     # 4. Merge individual PDFs into single consolidated PDF
     print("\n4-qadam: Barcha PDF'lar bitta yagona PDF faylga birlashtirilmoqda...")
+    if os.path.exists(merged_pdf_path):
+        try:
+            os.remove(merged_pdf_path)
+        except Exception:
+            pass
+
     merged = pymupdf.open()
     for full_pdf_path, pdf_name in pdf_files:
         with pymupdf.open(full_pdf_path) as sub:
